@@ -10,7 +10,8 @@ CREATE TABLE `tb_golongan` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 INSERT INTO `tb_golongan` (`id_golongan`, `nama_golongan`, `gaji_pokok`, `tunjangan_istri`, `jumlah_anak`, `tunjangan_anak`, `transport`, `uang_makan`) VALUES
-('001', 'Golongan Keren', 10000000.00, 500000.00, 2, 1000000.00, 100000.00, 300000.00);
+('GOL001', 'Karyawan', 3000000.00, 0.00, 0, 0.00, 100000.00, 250000.00),
+('GOL002', 'Admin', 5000000.00, 0.00, 0, 0.00, 100000.00, 250000.00);
 
 CREATE TABLE `tb_karyawan` (
   `id_karyawan` varchar(10) NOT NULL,
@@ -24,17 +25,21 @@ CREATE TABLE `tb_karyawan` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 INSERT INTO `tb_karyawan` (`id_karyawan`, `nama`, `alamat`, `jenis_kelamin`, `tempat_lahir`, `tanggal_lahir`, `status`, `id_golongan`) VALUES
-('001', 'Samsudin Asep', 'BLM Kecamatan Rt 4 RW 11', 'Laki-laki', 'Bogor', '1989-05-06', 'Menikah', '001');
+('001', 'Rizky', 'Menteng Asri', 'Laki-laki', 'Bogor', '2009-03-06', 'Tidak Menikah', 'GOL002'),
+('002', 'Suhendra', 'JL Farmasi', 'Laki-laki', 'Bogor', '1971-10-02', 'Menikah', 'GOL001');
 
 CREATE TABLE `tb_lembur` (
   `id_lembur` varchar(10) NOT NULL,
   `id_karyawan` varchar(10) DEFAULT NULL,
-  `tanggal_lembur` date DEFAULT NULL,
-  `jumlah` int(11) DEFAULT NULL
+  `tanggal_mulai` date DEFAULT NULL,
+  `tanggal_selesai` date DEFAULT NULL,
+  `jumlah_jam` int(11) DEFAULT NULL,
+  `upah_per_jam` decimal(15,2) DEFAULT NULL,
+  `total_lembur` decimal(15,2) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-INSERT INTO `tb_lembur` (`id_lembur`, `id_karyawan`, `tanggal_lembur`, `jumlah`) VALUES
-('001', '001', '2026-05-01', 500000);
+INSERT INTO `tb_lembur` (`id_lembur`, `id_karyawan`, `tanggal_mulai`, `tanggal_selesai`, `jumlah_jam`, `upah_per_jam`, `total_lembur`) VALUES
+('LMBR01', '001', '2026-05-17', '2026-05-18', 2, 100000.00, 200000.00);
 
 CREATE TABLE `tb_penggajian` (
   `id_gaji` varchar(10) NOT NULL,
@@ -42,6 +47,13 @@ CREATE TABLE `tb_penggajian` (
   `id_karyawan` varchar(10) DEFAULT NULL,
   `nama_karyawan` varchar(100) DEFAULT NULL,
   `golongan` varchar(50) DEFAULT NULL,
+  `gaji_pokok` decimal(15,2) DEFAULT NULL,
+  `tunjangan_istri` decimal(15,2) DEFAULT NULL,
+  `jumlah_anak` int(11) DEFAULT NULL,
+  `tunjangan_anak` decimal(15,2) DEFAULT NULL,
+  `total_tunjangan_anak` decimal(15,2) DEFAULT NULL,
+  `transport` decimal(15,2) DEFAULT NULL,
+  `uang_makan` decimal(15,2) DEFAULT NULL,
   `jumlah_gaji` decimal(15,2) DEFAULT NULL,
   `jumlah_lembur` decimal(15,2) DEFAULT NULL,
   `potongan` decimal(15,2) DEFAULT NULL,
@@ -49,8 +61,9 @@ CREATE TABLE `tb_penggajian` (
   `total_gaji` decimal(15,2) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-INSERT INTO `tb_penggajian` (`id_gaji`, `tanggal`, `id_karyawan`, `nama_karyawan`, `golongan`, `jumlah_gaji`, `jumlah_lembur`, `potongan`, `tanggal_gaji`, `total_gaji`) VALUES
-('001', '2026-05-06', '001', 'Samsudin Asep', 'Golongan Keren', 11900000.00, 500000.00, 1000000.00, '2026-06-01', 11400000.00);
+INSERT INTO `tb_penggajian` (`id_gaji`, `tanggal`, `id_karyawan`, `nama_karyawan`, `golongan`, `gaji_pokok`, `tunjangan_istri`, `jumlah_anak`, `tunjangan_anak`, `total_tunjangan_anak`, `transport`, `uang_makan`, `jumlah_gaji`, `jumlah_lembur`, `potongan`, `tanggal_gaji`, `total_gaji`) VALUES
+('GJI001', '2026-05-17', '001', 'Rizky', 'Admin', 5000000.00, 0.00, 0, 0.00, 0.00, 100000.00, 250000.00, 5350000.00, 200000.00, 0.00, '2026-06-01', 5550000.00),
+('GJI002', '2026-05-17', '002', 'Suhendra', 'Karyawan', 3000000.00, 100000.00, 2, 50000.00, 100000.00, 100000.00, 250000.00, 3550000.00, 0.00, 0.00, '2026-06-01', 3550000.00);
 
 CREATE TABLE `tb_user` (
   `username` varchar(50) NOT NULL,

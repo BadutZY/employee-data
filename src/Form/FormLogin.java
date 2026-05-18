@@ -24,6 +24,20 @@ public class FormLogin extends javax.swing.JFrame {
             System.err.println("Gagal memuat icon: " + e.getMessage());
         }
     }
+
+    private ImageIcon createSmallIcon(String resourcePath) {
+        try {
+            java.net.URL imgURL = getClass().getResource(resourcePath);
+            if (imgURL != null) {
+                ImageIcon icon = new ImageIcon(imgURL);
+                java.awt.Image img = icon.getImage().getScaledInstance(16, 16, java.awt.Image.SCALE_SMOOTH);
+                return new ImageIcon(img);
+            }
+        } catch (Exception e) {
+            System.err.println("Gagal memuat icon tombol: " + e.getMessage());
+        }
+        return null;
+    }
     
     @SuppressWarnings("unchecked")
     private void initComponents() {
@@ -42,14 +56,28 @@ public class FormLogin extends javax.swing.JFrame {
 
         jLabel2.setText("Password :");
 
+        // Tombol Login dengan icon
         btnLogin.setText("Login");
+        ImageIcon iconLogin = createSmallIcon("/foto/user.png");
+        if (iconLogin != null) {
+            btnLogin.setIcon(iconLogin);
+            btnLogin.setIconTextGap(6);
+            btnLogin.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        }
         btnLogin.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnLoginActionPerformed(evt);
             }
         });
 
+        // Tombol Exit dengan icon
         btnExit.setText("Exit");
+        ImageIcon iconExit = createSmallIcon("/foto/exit.png");
+        if (iconExit != null) {
+            btnExit.setIcon(iconExit);
+            btnExit.setIconTextGap(6);
+            btnExit.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        }
         btnExit.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnExitActionPerformed(evt);
@@ -72,9 +100,9 @@ public class FormLogin extends javax.swing.JFrame {
                 .addContainerGap(50, Short.MAX_VALUE))
             .addGroup(layout.createSequentialGroup()
                 .addGap(100, 100, 100)
-                .addComponent(btnLogin, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(btnLogin, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(30, 30, 30)
-                .addComponent(btnExit, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(btnExit, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(

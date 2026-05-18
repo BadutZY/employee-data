@@ -8,22 +8,21 @@ import java.text.NumberFormat;
 import java.util.Locale;
 
 public class FormGolongan extends javax.swing.JFrame {
-    
+
     private DefaultTableModel model;
-    
+
     public FormGolongan() {
         initComponents();
         setAppIcon();
         setLocationRelativeTo(null);
-        
-        String[] kolom = {"ID Golongan", "Nama Golongan", "Gaji Pokok", "Tunj. Istri", 
-                         "Jml Anak", "Tunj. Anak", "Transport", "Uang Makan"};
+
+        String[] kolom = {"ID Golongan", "Nama Golongan", "Gaji Pokok", "Transport", "Uang Makan"};
         model = new DefaultTableModel(kolom, 0);
         tblGolongan.setModel(model);
-        
+
         loadData();
     }
-    
+
     private void setAppIcon() {
         try {
             java.net.URL imgURL = getClass().getResource("/foto/icon.png");
@@ -37,23 +36,36 @@ public class FormGolongan extends javax.swing.JFrame {
         }
     }
 
-    // FORMAT ANGKA: 5000000 -> 5.000.000
+    private ImageIcon createIconForButton(String iconFile) {
+        try {
+            java.net.URL imgURL = getClass().getResource("/foto/" + iconFile);
+            if (imgURL != null) {
+                ImageIcon icon = new ImageIcon(imgURL);
+                java.awt.Image img = icon.getImage().getScaledInstance(16, 16, java.awt.Image.SCALE_SMOOTH);
+                return new ImageIcon(img);
+            }
+        } catch (Exception e) {
+            System.err.println("Gagal memuat icon tombol: " + e.getMessage());
+        }
+        return null;
+    }
+
     private String formatAngka(double angka) {
         NumberFormat nf = NumberFormat.getInstance(new Locale("id", "ID"));
         nf.setMaximumFractionDigits(0);
         return nf.format(angka);
     }
 
-    // Hapus titik sebelum parse ke double
     private double parseAngka(String teks) {
-        return Double.parseDouble(teks.replace(".", "").replace(",", ""));
+        if (teks == null || teks.trim().isEmpty()) return 0;
+        return Double.parseDouble(teks.trim().replace(".", "").replace(",", ""));
     }
-    
+
     private void loadData() {
         model.setRowCount(0);
         try {
             Connection conn = Koneksi.getKoneksi();
-            String sql = "SELECT * FROM tb_golongan";
+            String sql = "SELECT id_golongan, nama_golongan, gaji_pokok, transport, uang_makan FROM tb_golongan";
             Statement st = conn.createStatement();
             ResultSet rs = st.executeQuery(sql);
             while (rs.next()) {
@@ -61,9 +73,6 @@ public class FormGolongan extends javax.swing.JFrame {
                     rs.getString("id_golongan"),
                     rs.getString("nama_golongan"),
                     formatAngka(rs.getDouble("gaji_pokok")),
-                    formatAngka(rs.getDouble("tunjangan_istri")),
-                    rs.getInt("jumlah_anak"),
-                    formatAngka(rs.getDouble("tunjangan_anak")),
                     formatAngka(rs.getDouble("transport")),
                     formatAngka(rs.getDouble("uang_makan"))
                 });
@@ -72,18 +81,23 @@ public class FormGolongan extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Error load data: " + e.getMessage());
         }
     }
-    
+
     private void clearForm() {
         txtIdGolongan.setText("");
         txtNamaGolongan.setText("");
         txtGajiPokok.setText("");
-        txtTunjanganIstri.setText("");
-        txtJumlahAnak.setText("");
-        txtTunjanganAnak.setText("");
         txtTransport.setText("");
         txtUangMakan.setText("");
     }
-    
+
+    private void applyButtonIcon(JButton btn, String iconFile) {
+        ImageIcon icon = createIconForButton(iconFile);
+        if (icon != null) {
+            btn.setIcon(icon);
+            btn.setIconTextGap(5);
+        }
+    }
+
     @SuppressWarnings("unchecked")
     private void initComponents() {
         jLabel1 = new javax.swing.JLabel();
@@ -92,63 +106,67 @@ public class FormGolongan extends javax.swing.JFrame {
         jLabel4 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
-        jLabel7 = new javax.swing.JLabel();
-        jLabel8 = new javax.swing.JLabel();
-        jLabel9 = new javax.swing.JLabel();
-        txtIdGolongan = new javax.swing.JTextField();
+
+        txtIdGolongan   = new javax.swing.JTextField();
         txtNamaGolongan = new javax.swing.JTextField();
-        txtGajiPokok = new javax.swing.JTextField();
-        txtTunjanganIstri = new javax.swing.JTextField();
-        txtJumlahAnak = new javax.swing.JTextField();
-        txtTunjanganAnak = new javax.swing.JTextField();
-        txtTransport = new javax.swing.JTextField();
-        txtUangMakan = new javax.swing.JTextField();
-        btnSave = new javax.swing.JButton();
-        btnReset = new javax.swing.JButton();
+        txtGajiPokok    = new javax.swing.JTextField();
+        txtTransport    = new javax.swing.JTextField();
+        txtUangMakan    = new javax.swing.JTextField();
+
+        btnSave   = new javax.swing.JButton();
+        btnReset  = new javax.swing.JButton();
         btnUpdate = new javax.swing.JButton();
         btnDelete = new javax.swing.JButton();
-        btnExit = new javax.swing.JButton();
+        btnExit   = new javax.swing.JButton();
+
         jScrollPane1 = new javax.swing.JScrollPane();
-        tblGolongan = new javax.swing.JTable();
+        tblGolongan  = new javax.swing.JTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Form Golongan");
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 1, 16));
         jLabel1.setText("DATA GOLONGAN");
+
         jLabel2.setText("Id. Golongan");
         jLabel3.setText("Nama Golongan");
         jLabel4.setText("Gaji Pokok");
-        jLabel5.setText("Tunjangan Istri");
-        jLabel6.setText("Jumlah Anak");
-        jLabel7.setText("Tunjangan Anak");
-        jLabel8.setText("Transport");
-        jLabel9.setText("Uang Makan");
+        jLabel5.setText("Transport");
+        jLabel6.setText("Uang Makan");
 
         btnSave.setText("Save");
+        applyButtonIcon(btnSave, "save.png");
         btnSave.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) { btnSaveActionPerformed(evt); }
         });
+
         btnReset.setText("Reset");
+        applyButtonIcon(btnReset, "reset.png");
         btnReset.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) { btnResetActionPerformed(evt); }
         });
+
         btnUpdate.setText("Update");
+        applyButtonIcon(btnUpdate, "update.png");
         btnUpdate.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) { btnUpdateActionPerformed(evt); }
         });
+
         btnDelete.setText("Delete");
+        applyButtonIcon(btnDelete, "delete.png");
         btnDelete.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) { btnDeleteActionPerformed(evt); }
         });
+
         btnExit.setText("Exit");
+        applyButtonIcon(btnExit, "exit.png");
         btnExit.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) { btnExitActionPerformed(evt); }
         });
 
         tblGolongan.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {},
-            new String [] {"ID", "Nama", "Gaji Pokok", "Tunj Istri", "Jml Anak", "Tunj Anak", "Transport", "Uang Makan"}
+            new Object[][]{},
+            new String[]{"ID Golongan", "Nama Golongan", "Gaji Pokok", "Transport", "Uang Makan"}
         ));
         tblGolongan.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) { tblGolonganMouseClicked(evt); }
@@ -157,61 +175,64 @@ public class FormGolongan extends javax.swing.JFrame {
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
+
+        int W = 200;
+
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(30).addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGap(30)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel1)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel2).addComponent(jLabel3).addComponent(jLabel4).addComponent(jLabel5))
+                            .addComponent(jLabel2)
+                            .addComponent(jLabel3))
                         .addGap(30)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(txtIdGolongan, javax.swing.GroupLayout.DEFAULT_SIZE, 200, Short.MAX_VALUE)
-                            .addComponent(txtNamaGolongan).addComponent(txtGajiPokok).addComponent(txtTunjanganIstri))
+                            .addComponent(txtIdGolongan,   javax.swing.GroupLayout.DEFAULT_SIZE, W, Short.MAX_VALUE)
+                            .addComponent(txtNamaGolongan))
                         .addGap(50)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel6).addComponent(jLabel7).addComponent(jLabel8).addComponent(jLabel9))
+                            .addComponent(jLabel4)
+                            .addComponent(jLabel5)
+                            .addComponent(jLabel6))
                         .addGap(30)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(txtJumlahAnak, javax.swing.GroupLayout.DEFAULT_SIZE, 200, Short.MAX_VALUE)
-                            .addComponent(txtTunjanganAnak).addComponent(txtTransport).addComponent(txtUangMakan)))
+                            .addComponent(txtGajiPokok, javax.swing.GroupLayout.DEFAULT_SIZE, W, Short.MAX_VALUE)
+                            .addComponent(txtTransport)
+                            .addComponent(txtUangMakan)))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(btnSave, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE).addGap(10)
-                        .addComponent(btnReset, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE).addGap(10)
-                        .addComponent(btnUpdate, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE).addGap(10)
-                        .addComponent(btnDelete, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE).addGap(10)
-                        .addComponent(btnExit, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 700, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(btnSave,   javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE).addGap(8)
+                        .addComponent(btnReset,  javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE).addGap(8)
+                        .addComponent(btnUpdate, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE).addGap(8)
+                        .addComponent(btnDelete, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE).addGap(8)
+                        .addComponent(btnExit,   javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 620, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(30, Short.MAX_VALUE))
         );
+
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(20).addComponent(jLabel1).addGap(20)
+                .addGap(20)
+                .addComponent(jLabel1)
+                .addGap(20)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
-                    .addComponent(txtIdGolongan, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel6)
-                    .addComponent(txtJumlahAnak, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtIdGolongan,   javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel4)
+                    .addComponent(txtGajiPokok,    javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(15)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
                     .addComponent(txtNamaGolongan, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel7)
-                    .addComponent(txtTunjanganAnak, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(15)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel4)
-                    .addComponent(txtGajiPokok, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel8)
-                    .addComponent(txtTransport, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(15)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel5)
-                    .addComponent(txtTunjanganIstri, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel9)
-                    .addComponent(txtUangMakan, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtTransport,    javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(15)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel6)
+                    .addComponent(txtUangMakan,    javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(20)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnSave).addComponent(btnReset).addComponent(btnUpdate)
@@ -220,22 +241,22 @@ public class FormGolongan extends javax.swing.JFrame {
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(20, Short.MAX_VALUE))
         );
+
         pack();
     }
 
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {
         try {
             Connection conn = Koneksi.getKoneksi();
-            String sql = "INSERT INTO tb_golongan VALUES (?,?,?,?,?,?,?,?)";
+            String sql = "INSERT INTO tb_golongan " +
+                         "(id_golongan, nama_golongan, gaji_pokok, tunjangan_istri, jumlah_anak, tunjangan_anak, transport, uang_makan) " +
+                         "VALUES (?,?,?,0,0,0,?,?)";
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setString(1, txtIdGolongan.getText());
             ps.setString(2, txtNamaGolongan.getText());
             ps.setDouble(3, parseAngka(txtGajiPokok.getText()));
-            ps.setDouble(4, parseAngka(txtTunjanganIstri.getText()));
-            ps.setInt(5, Integer.parseInt(txtJumlahAnak.getText()));
-            ps.setDouble(6, parseAngka(txtTunjanganAnak.getText()));
-            ps.setDouble(7, parseAngka(txtTransport.getText()));
-            ps.setDouble(8, parseAngka(txtUangMakan.getText()));
+            ps.setDouble(4, parseAngka(txtTransport.getText()));
+            ps.setDouble(5, parseAngka(txtUangMakan.getText()));
             ps.executeUpdate();
             JOptionPane.showMessageDialog(this, "Data berhasil disimpan!");
             clearForm(); loadData();
@@ -249,17 +270,14 @@ public class FormGolongan extends javax.swing.JFrame {
     private void btnUpdateActionPerformed(java.awt.event.ActionEvent evt) {
         try {
             Connection conn = Koneksi.getKoneksi();
-            String sql = "UPDATE tb_golongan SET nama_golongan=?, gaji_pokok=?, tunjangan_istri=?, " +
-                        "jumlah_anak=?, tunjangan_anak=?, transport=?, uang_makan=? WHERE id_golongan=?";
+            String sql = "UPDATE tb_golongan SET nama_golongan=?, gaji_pokok=?, transport=?, uang_makan=? " +
+                         "WHERE id_golongan=?";
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setString(1, txtNamaGolongan.getText());
             ps.setDouble(2, parseAngka(txtGajiPokok.getText()));
-            ps.setDouble(3, parseAngka(txtTunjanganIstri.getText()));
-            ps.setInt(4, Integer.parseInt(txtJumlahAnak.getText()));
-            ps.setDouble(5, parseAngka(txtTunjanganAnak.getText()));
-            ps.setDouble(6, parseAngka(txtTransport.getText()));
-            ps.setDouble(7, parseAngka(txtUangMakan.getText()));
-            ps.setString(8, txtIdGolongan.getText());
+            ps.setDouble(3, parseAngka(txtTransport.getText()));
+            ps.setDouble(4, parseAngka(txtUangMakan.getText()));
+            ps.setString(5, txtIdGolongan.getText());
             ps.executeUpdate();
             JOptionPane.showMessageDialog(this, "Data berhasil diupdate!");
             clearForm(); loadData();
@@ -290,21 +308,15 @@ public class FormGolongan extends javax.swing.JFrame {
         int row = tblGolongan.getSelectedRow();
         txtIdGolongan.setText(model.getValueAt(row, 0).toString());
         txtNamaGolongan.setText(model.getValueAt(row, 1).toString());
-        // Hapus titik agar bisa diedit langsung
         txtGajiPokok.setText(model.getValueAt(row, 2).toString().replace(".", ""));
-        txtTunjanganIstri.setText(model.getValueAt(row, 3).toString().replace(".", ""));
-        txtJumlahAnak.setText(model.getValueAt(row, 4).toString());
-        txtTunjanganAnak.setText(model.getValueAt(row, 5).toString().replace(".", ""));
-        txtTransport.setText(model.getValueAt(row, 6).toString().replace(".", ""));
-        txtUangMakan.setText(model.getValueAt(row, 7).toString().replace(".", ""));
+        txtTransport.setText(model.getValueAt(row, 3).toString().replace(".", ""));
+        txtUangMakan.setText(model.getValueAt(row, 4).toString().replace(".", ""));
     }
 
     private javax.swing.JButton btnDelete, btnExit, btnReset, btnSave, btnUpdate;
-    private javax.swing.JLabel jLabel1, jLabel2, jLabel3, jLabel4, jLabel5,
-                               jLabel6, jLabel7, jLabel8, jLabel9;
+    private javax.swing.JLabel jLabel1, jLabel2, jLabel3, jLabel4, jLabel5, jLabel6;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable tblGolongan;
-    private javax.swing.JTextField txtGajiPokok, txtIdGolongan, txtJumlahAnak,
-                                   txtNamaGolongan, txtTransport, txtTunjanganAnak,
-                                   txtTunjanganIstri, txtUangMakan;
+    private javax.swing.JTextField txtIdGolongan, txtNamaGolongan,
+                                   txtGajiPokok, txtTransport, txtUangMakan;
 }

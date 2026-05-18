@@ -16,31 +16,48 @@ public class FormKaryawan extends javax.swing.JFrame {
         setAppIcon();
         setLocationRelativeTo(null);
 
-        String[] kolom = {"ID Karyawan", "Nama", "Alamat", "Jenis Kelamin", "Tempat Lahir", "Tanggal Lahir", "Status", "ID Golongan"};
+        String[] kolom = {"ID Karyawan", "Nama", "Alamat", "Jenis Kelamin",
+                          "Tempat Lahir", "Tanggal Lahir", "Status", "ID Golongan"};
         model = new DefaultTableModel(kolom, 0);
         tblKaryawan.setModel(model);
 
-        // isi dropdown golongan dari DB
         loadGolongan();
         loadData();
     }
-    
+
     private void setAppIcon() {
         try {
             java.net.URL imgURL = getClass().getResource("/foto/icon.png");
             if (imgURL != null) {
                 setIconImage(new ImageIcon(imgURL).getImage());
-            } else {
-                System.err.println("Icon tidak ditemukan: /foto/icon.png");
             }
         } catch (Exception e) {
             System.err.println("Gagal memuat icon: " + e.getMessage());
         }
     }
 
-    // =====================================================================
-    // BARU: load ID Golongan ke JComboBox dari tb_golongan
-    // =====================================================================
+    private ImageIcon createIconForButton(String iconFile) {
+        try {
+            java.net.URL imgURL = getClass().getResource("/foto/" + iconFile);
+            if (imgURL != null) {
+                ImageIcon icon = new ImageIcon(imgURL);
+                java.awt.Image img = icon.getImage().getScaledInstance(16, 16, java.awt.Image.SCALE_SMOOTH);
+                return new ImageIcon(img);
+            }
+        } catch (Exception e) {
+            System.err.println("Gagal memuat icon tombol: " + e.getMessage());
+        }
+        return null;
+    }
+
+    private void applyButtonIcon(JButton btn, String iconFile) {
+        ImageIcon icon = createIconForButton(iconFile);
+        if (icon != null) {
+            btn.setIcon(icon);
+            btn.setIconTextGap(5);
+        }
+    }
+
     private void loadGolongan() {
         cmbGolongan.removeAllItems();
         try {
@@ -49,7 +66,6 @@ public class FormKaryawan extends javax.swing.JFrame {
             Statement st = conn.createStatement();
             ResultSet rs = st.executeQuery(sql);
             while (rs.next()) {
-                // format: "12 - Golongan Keren" supaya user tahu nama golongannya
                 cmbGolongan.addItem(rs.getString("id_golongan") + " - " + rs.getString("nama_golongan"));
             }
         } catch (SQLException e) {
@@ -57,7 +73,6 @@ public class FormKaryawan extends javax.swing.JFrame {
         }
     }
 
-    // ambil hanya ID golongan dari item combo (sebelum " - ")
     private String getIdGolongan() {
         if (cmbGolongan.getSelectedItem() == null) return "";
         return cmbGolongan.getSelectedItem().toString().split(" - ")[0].trim();
@@ -67,9 +82,8 @@ public class FormKaryawan extends javax.swing.JFrame {
         model.setRowCount(0);
         try {
             Connection conn = Koneksi.getKoneksi();
-            String sql = "SELECT * FROM tb_karyawan";
             Statement st = conn.createStatement();
-            ResultSet rs = st.executeQuery(sql);
+            ResultSet rs = st.executeQuery("SELECT * FROM tb_karyawan");
             while (rs.next()) {
                 model.addRow(new Object[]{
                     rs.getString("id_karyawan"),
@@ -91,7 +105,6 @@ public class FormKaryawan extends javax.swing.JFrame {
         txtIdKaryawan.setText("");
         txtNama.setText("");
         txtAlamat.setText("");
-        // reset combo ke item pertama
         if (cmbJenisKelamin.getItemCount() > 0) cmbJenisKelamin.setSelectedIndex(0);
         txtTempatLahir.setText("");
         dateChooser.setDate(null);
@@ -101,15 +114,15 @@ public class FormKaryawan extends javax.swing.JFrame {
 
     @SuppressWarnings("unchecked")
     private void initComponents() {
-        jLabel1  = new javax.swing.JLabel();
-        jLabel2  = new javax.swing.JLabel();
-        jLabel3  = new javax.swing.JLabel();
-        jLabel4  = new javax.swing.JLabel();
-        jLabel5  = new javax.swing.JLabel();
-        jLabel6  = new javax.swing.JLabel();
-        jLabel7  = new javax.swing.JLabel();
-        jLabel8  = new javax.swing.JLabel();
-        jLabel9  = new javax.swing.JLabel();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
+        jLabel5 = new javax.swing.JLabel();
+        jLabel6 = new javax.swing.JLabel();
+        jLabel7 = new javax.swing.JLabel();
+        jLabel8 = new javax.swing.JLabel();
+        jLabel9 = new javax.swing.JLabel();
 
         txtIdKaryawan  = new javax.swing.JTextField();
         txtNama        = new javax.swing.JTextField();
@@ -117,9 +130,6 @@ public class FormKaryawan extends javax.swing.JFrame {
         txtTempatLahir = new javax.swing.JTextField();
         dateChooser    = new com.toedter.calendar.JDateChooser();
 
-        // =====================================================================
-        // DIGANTI: JTextField -> JComboBox untuk Jenis Kelamin, Status, Golongan
-        // =====================================================================
         cmbJenisKelamin = new javax.swing.JComboBox<>(new String[]{"Laki-laki", "Perempuan"});
         cmbStatus       = new javax.swing.JComboBox<>(new String[]{"Tidak Menikah", "Menikah", "Cerai"});
         cmbGolongan     = new javax.swing.JComboBox<>();
@@ -149,19 +159,29 @@ public class FormKaryawan extends javax.swing.JFrame {
         jLabel9.setText("Golongan");
 
         btnSave.setText("Save");
+        applyButtonIcon(btnSave, "save.png");
         btnSave.addActionListener(evt -> btnSaveActionPerformed(evt));
+
         btnReset.setText("Reset");
+        applyButtonIcon(btnReset, "reset.png");
         btnReset.addActionListener(evt -> btnResetActionPerformed(evt));
+
         btnUpdate.setText("Update");
+        applyButtonIcon(btnUpdate, "update.png");
         btnUpdate.addActionListener(evt -> btnUpdateActionPerformed(evt));
+
         btnDelete.setText("Delete");
+        applyButtonIcon(btnDelete, "delete.png");
         btnDelete.addActionListener(evt -> btnDeleteActionPerformed(evt));
+
         btnExit.setText("Exit");
+        applyButtonIcon(btnExit, "exit.png");
         btnExit.addActionListener(evt -> btnExitActionPerformed(evt));
 
         tblKaryawan.setModel(new javax.swing.table.DefaultTableModel(
             new Object[][]{},
-            new String[]{"ID Karyawan", "Nama", "Alamat", "Jenis Kelamin", "Tempat Lahir", "Tanggal Lahir", "Status", "ID Golongan"}
+            new String[]{"ID Karyawan", "Nama", "Alamat", "Jenis Kelamin",
+                         "Tempat Lahir", "Tanggal Lahir", "Status", "ID Golongan"}
         ));
         tblKaryawan.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -170,12 +190,15 @@ public class FormKaryawan extends javax.swing.JFrame {
         });
         jScrollPane1.setViewportView(tblKaryawan);
 
+        int W = 200;
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
+
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(30, 30, 30)
+                .addGap(30)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel1)
                     .addGroup(layout.createSequentialGroup()
@@ -183,34 +206,35 @@ public class FormKaryawan extends javax.swing.JFrame {
                             .addComponent(jLabel2)
                             .addComponent(jLabel3)
                             .addComponent(jLabel4)
-                            .addComponent(jLabel5)
+                            .addComponent(jLabel5))
+                        .addGap(20)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(txtIdKaryawan,    javax.swing.GroupLayout.DEFAULT_SIZE, W, Short.MAX_VALUE)
+                            .addComponent(txtNama)
+                            .addComponent(txtAlamat)
+                            .addComponent(cmbJenisKelamin,  0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGap(40)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel6)
                             .addComponent(jLabel7)
                             .addComponent(jLabel8)
                             .addComponent(jLabel9))
-                        .addGap(30, 30, 30)
+                        .addGap(20)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(txtIdKaryawan, javax.swing.GroupLayout.DEFAULT_SIZE, 250, Short.MAX_VALUE)
-                            .addComponent(txtNama)
-                            .addComponent(txtAlamat)
-                            .addComponent(cmbJenisKelamin, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(txtTempatLahir)
-                            .addComponent(dateChooser, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(cmbStatus, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(cmbGolongan, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                            .addComponent(txtTempatLahir,   javax.swing.GroupLayout.DEFAULT_SIZE, W, Short.MAX_VALUE)
+                            .addComponent(dateChooser,      javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(cmbStatus,        0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(cmbGolongan,      0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(btnSave,   javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(10)
-                        .addComponent(btnReset,  javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(10)
-                        .addComponent(btnUpdate, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(10)
-                        .addComponent(btnDelete, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(10)
-                        .addComponent(btnExit,   javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(btnSave,   javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE).addGap(8)
+                        .addComponent(btnReset,  javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE).addGap(8)
+                        .addComponent(btnUpdate, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE).addGap(8)
+                        .addComponent(btnDelete, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE).addGap(8)
+                        .addComponent(btnExit,   javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 700, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(30, Short.MAX_VALUE))
         );
+
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
@@ -219,42 +243,31 @@ public class FormKaryawan extends javax.swing.JFrame {
                 .addGap(20)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
-                    .addComponent(txtIdKaryawan, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(10)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel3)
-                    .addComponent(txtNama, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(10)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel4)
-                    .addComponent(txtAlamat, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(10)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel5)
-                    .addComponent(cmbJenisKelamin, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(10)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(txtIdKaryawan,  javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel6)
                     .addComponent(txtTempatLahir, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(10)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGap(12)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel3)
+                    .addComponent(txtNama,        javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel7)
-                    .addComponent(dateChooser, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(10)
+                    .addComponent(dateChooser,    javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(12)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel4)
+                    .addComponent(txtAlamat,      javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel8)
-                    .addComponent(cmbStatus, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(10)
+                    .addComponent(cmbStatus,      javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(12)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel5)
+                    .addComponent(cmbJenisKelamin,javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel9)
-                    .addComponent(cmbGolongan, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(cmbGolongan,    javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(20)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnSave)
-                    .addComponent(btnReset)
-                    .addComponent(btnUpdate)
-                    .addComponent(btnDelete)
-                    .addComponent(btnExit))
+                    .addComponent(btnSave).addComponent(btnReset).addComponent(btnUpdate)
+                    .addComponent(btnDelete).addComponent(btnExit))
                 .addGap(20)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(20, Short.MAX_VALUE))
@@ -267,10 +280,8 @@ public class FormKaryawan extends javax.swing.JFrame {
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
             String tglLahir = sdf.format(dateChooser.getDate());
-
             Connection conn = Koneksi.getKoneksi();
-            String sql = "INSERT INTO tb_karyawan VALUES (?,?,?,?,?,?,?,?)";
-            PreparedStatement ps = conn.prepareStatement(sql);
+            PreparedStatement ps = conn.prepareStatement("INSERT INTO tb_karyawan VALUES (?,?,?,?,?,?,?,?)");
             ps.setString(1, txtIdKaryawan.getText());
             ps.setString(2, txtNama.getText());
             ps.setString(3, txtAlamat.getText());
@@ -280,27 +291,23 @@ public class FormKaryawan extends javax.swing.JFrame {
             ps.setString(7, cmbStatus.getSelectedItem().toString());
             ps.setString(8, getIdGolongan());
             ps.executeUpdate();
-
             JOptionPane.showMessageDialog(this, "Data berhasil disimpan!");
-            clearForm();
-            loadData();
+            clearForm(); loadData();
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
         }
     }
 
-    private void btnResetActionPerformed(java.awt.event.ActionEvent evt) {
-        clearForm();
-    }
+    private void btnResetActionPerformed(java.awt.event.ActionEvent evt) { clearForm(); }
 
     private void btnUpdateActionPerformed(java.awt.event.ActionEvent evt) {
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
             String tglLahir = sdf.format(dateChooser.getDate());
-
             Connection conn = Koneksi.getKoneksi();
-            String sql = "UPDATE tb_karyawan SET nama=?, alamat=?, jenis_kelamin=?, tempat_lahir=?, tanggal_lahir=?, status=?, id_golongan=? WHERE id_karyawan=?";
-            PreparedStatement ps = conn.prepareStatement(sql);
+            PreparedStatement ps = conn.prepareStatement(
+                "UPDATE tb_karyawan SET nama=?, alamat=?, jenis_kelamin=?, tempat_lahir=?, " +
+                "tanggal_lahir=?, status=?, id_golongan=? WHERE id_karyawan=?");
             ps.setString(1, txtNama.getText());
             ps.setString(2, txtAlamat.getText());
             ps.setString(3, cmbJenisKelamin.getSelectedItem().toString());
@@ -310,10 +317,8 @@ public class FormKaryawan extends javax.swing.JFrame {
             ps.setString(7, getIdGolongan());
             ps.setString(8, txtIdKaryawan.getText());
             ps.executeUpdate();
-
             JOptionPane.showMessageDialog(this, "Data berhasil diupdate!");
-            clearForm();
-            loadData();
+            clearForm(); loadData();
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
         }
@@ -324,23 +329,18 @@ public class FormKaryawan extends javax.swing.JFrame {
         if (confirm == JOptionPane.YES_OPTION) {
             try {
                 Connection conn = Koneksi.getKoneksi();
-                String sql = "DELETE FROM tb_karyawan WHERE id_karyawan=?";
-                PreparedStatement ps = conn.prepareStatement(sql);
+                PreparedStatement ps = conn.prepareStatement("DELETE FROM tb_karyawan WHERE id_karyawan=?");
                 ps.setString(1, txtIdKaryawan.getText());
                 ps.executeUpdate();
-
                 JOptionPane.showMessageDialog(this, "Data berhasil dihapus!");
-                clearForm();
-                loadData();
+                clearForm(); loadData();
             } catch (SQLException e) {
                 JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
             }
         }
     }
 
-    private void btnExitActionPerformed(java.awt.event.ActionEvent evt) {
-        this.dispose();
-    }
+    private void btnExitActionPerformed(java.awt.event.ActionEvent evt) { this.dispose(); }
 
     private void tblKaryawanMouseClicked(java.awt.event.MouseEvent evt) {
         try {
@@ -350,18 +350,13 @@ public class FormKaryawan extends javax.swing.JFrame {
             txtAlamat.setText(model.getValueAt(row, 2).toString());
             cmbJenisKelamin.setSelectedItem(model.getValueAt(row, 3).toString());
             txtTempatLahir.setText(model.getValueAt(row, 4).toString());
-
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
             dateChooser.setDate(sdf.parse(model.getValueAt(row, 5).toString()));
-
             cmbStatus.setSelectedItem(model.getValueAt(row, 6).toString());
-
-            // set combo golongan: cari item yang diawali id_golongan
             String idGol = model.getValueAt(row, 7).toString();
             for (int i = 0; i < cmbGolongan.getItemCount(); i++) {
                 if (cmbGolongan.getItemAt(i).toString().startsWith(idGol + " - ")) {
-                    cmbGolongan.setSelectedIndex(i);
-                    break;
+                    cmbGolongan.setSelectedIndex(i); break;
                 }
             }
         } catch (Exception e) {
